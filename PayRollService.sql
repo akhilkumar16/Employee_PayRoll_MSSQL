@@ -51,3 +51,37 @@ ALTER TABLE Employee_PayRoll ADD Department varchar(250) not null default 'D';
 --UC9 Ability to extend employee payroll table to have basic pay, deductions,taxable pay,income tax,net pay
 ALTER TABLE Employee_PayRoll ADD Deduction bigint,Taxable_Pay float,Income_Tax float,Net_Pay float;
 SELECT * FROM EMPLOYEE_PAYROLL
+--Er diagram
+create table PayrollDetails(
+Payroll_id int not null Primary Key,
+BasePay int not null,
+Deduction int not null,
+TaxtablePay as (BasePay-Deduction) persisted,
+NetPay as (BasePay-Deduction-0.05*( BasePay-Deduction)) persisted,
+IncomeTax as 0.05*(BasePay-Deduction) persisted
+);
+select * from PayrollDetails
+
+--Insert Values PayrollDetails Table
+insert into PayrollDetails values (1,500000,40000),(2,400000,8000),(3,450000,50000),(4,300000,45000);
+select * from PayrollDetails
+
+
+--UC11.2:- Create EmployeeDetails Table
+create table EmployeeDetails 
+(
+Emp_id int not null Primary Key identity(1,1),
+Emp_Name varchar(50) not null,
+Gender char(1) not null,
+Phone_Number varchar(50),
+Payroll_id int not null Foreign key References PayrollDetails(Payroll_id),
+Start_Date Date default GetDate()
+);
+select * from EmployeeDetails; 
+
+--insert values into EmployeeDetails Table
+INSERT into EmployeeDetails(Emp_Name,Gender,Phone_Number,Payroll_id) values
+('ak','M','123456','1'),
+('pk','M','654123','2'),
+('rk','M','987456','3'),
+('Terissa','F','654789','4');
